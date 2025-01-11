@@ -1,0 +1,7 @@
+/Users/mengxuan/Projects/finshark/api/obj/Debug/net7.0/api.csproj.AssemblyReference.cache
+/Users/mengxuan/Projects/finshark/api/obj/Debug/net7.0/api.GeneratedMSBuildEditorConfig.editorconfig
+/Users/mengxuan/Projects/finshark/api/obj/Debug/net7.0/api.AssemblyInfoInputs.cache
+/Users/mengxuan/Projects/finshark/api/obj/Debug/net7.0/api.AssemblyInfo.cs
+/Users/mengxuan/Projects/finshark/api/obj/Debug/net7.0/api.csproj.CoreCompileInputs.cache
+/Users/mengxuan/Projects/finshark/api/obj/Debug/net7.0/api.MvcApplicationPartsAssemblyInfo.cs
+/Users/mengxuan/Projects/finshark/api/obj/Debug/net7.0/api.MvcApplicationPartsAssemblyInfo.cache
