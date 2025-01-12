@@ -133,3 +133,4 @@
 /Users/mengxuan/Projects/finshark/api/obj/Debug/net8.0/api.pdb
 /Users/mengxuan/Projects/finshark/api/obj/Debug/net8.0/api.genruntimeconfig.cache
 /Users/mengxuan/Projects/finshark/api/obj/Debug/net8.0/ref/api.dll
+/Users/mengxuan/Projects/finshark/api/obj/Debug/net8.0/api.sourcelink.json

@@ -1,4 +1,6 @@
 using api.Data;
+using api.Dtos.Stock;
+using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace api.Controllers
@@ -16,7 +18,7 @@ namespace api.Controllers
         [HttpGet]
 
         public IActionResult GetAll() { 
-            var stocks = _context.Stocks.ToList();
+            var stocks = _context.Stocks.Select(s=>s.ToStockDto()).ToList();
             return Ok(stocks);
          }
 
@@ -28,8 +30,40 @@ namespace api.Controllers
             if(stock==null){
                 return NotFound();
             }
+            return Ok(stock.ToStockDto());
+         }
 
-            return Ok(stock);
+         [HttpPost]
+
+         public IActionResult Create([FromBody]CreateStockRequestDto stockDto){
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var stockModel=stockDto.ToStockFromCreateDto();
+            _context.Add(stockModel);
+            _context.SaveChanges();//DB automatically creates PK
+            return CreatedAtAction(nameof(GetById),new { id = stockModel.Id }, stockModel.ToStockDto());
+         }
+
+         [HttpPut]
+         [Route("{id:int}")]
+
+         public IActionResult Update([FromRoute]int id, [FromBody] UpdateStockRequestDto updateDto){
+            var stockModel=_context.Stocks.FirstOrDefault(x=>x.Id==id);
+
+            if(stockModel==null){
+                return NotFound();
+            }
+
+            stockModel.Symbol=updateDto.Symbol;
+            stockModel.CompanyName=updateDto.CompanyName;
+            stockModel.Purchase=updateDto.Purchase;
+            stockModel.LastDiv=updateDto.LastDiv;
+            stockModel.Industry=updateDto.Industry;
+            stockModel.MarketCap=updateDto.MarketCap;
+
+            _context.SaveChanges();
+            return Ok(stockModel.ToStockDto());
          }
     }
 }
