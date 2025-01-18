@@ -1,15 +1,20 @@
-namespace api.Models{
-public class Comment{
-    public int Id { get; set; }
+using System.ComponentModel.DataAnnotations.Schema;
 
-    public string Title { get; set; }=string.Empty;
+namespace api.Models
+{
+    public class Comment
+    {
+        public int Id { get; set; }
 
-    public string Content { get; set; }=string.Empty;
+        public string Title { get; set; } = string.Empty;
 
-    public DateTime CreatedOn { get; set; }=DateTime.Now;
+        public string Content { get; set; } = string.Empty;
 
-    public int? StockId { get; set; }
+        // [Column(TypeName = "timestamp with time zone")]
+        public DateTime CreatedOn { get; set; } = DateTime.UtcNow;
 
-    public Stock? Stock { get; set; }
-}
-}
+        public int? StockId { get; set; }
+
+        public Stock? Stock { get; set; }
+    }
+};

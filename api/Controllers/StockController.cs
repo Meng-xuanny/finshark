@@ -22,11 +22,12 @@ namespace api.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll() { 
             var stocks = await _stockRepo.GetAllAsync();
-            var stockDto=stocks.Select(s=>s.ToStockDto());
-            return Ok(stocks);
+            var stockDto=stocks.Select(s=>s.ToStockDto()).ToList();
+            return Ok(stockDto);
          }
 
-         [HttpGet("{id}")]
+
+        [HttpGet("{id}")]
 
          public async Task<IActionResult> GetById([FromRoute]int id)
         {
