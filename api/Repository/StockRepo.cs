@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using api.Data;
 using api.Dtos.Stock;
+using api.Helppers;
 using api.Interfaces;
 using api.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -14,9 +15,10 @@ namespace api.Repository
     public class StockRepo : IStockRepository
     {
         private readonly ApplicationDBContext _context;
+
         public StockRepo(ApplicationDBContext context)
         {
-            _context=context;
+            _context = context;
         }
 
         public async Task<Stock> CreateAsync(Stock stockModel)
@@ -40,14 +42,28 @@ namespace api.Repository
             return stockModel;
         }
 
-        public async Task<List<Stock>> GetAllAsync()
+        public async Task<List<Stock>> GetAllAsync(QueryObject query)
         {
-            return await _context.Stocks.Include(c=>c.Comments).ToListAsync();
+            var stocks = _context.Stocks.Include(c => c.Comments).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(query.CompanyName))
+            {
+                stocks = stocks.Where(s => s.CompanyName.Contains(query.CompanyName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Symbol))
+            {
+                stocks = stocks.Where(s => s.Symbol.Contains(query.Symbol));
+            }
+
+            return await stocks.ToListAsync(); //returns all stocks if no query's given
         }
 
         public async Task<Stock?> GetByIdAsync(int id)
         {
-            return await _context.Stocks.Include(c=>c.Comments).FirstOrDefaultAsync(s=>s.Id==id);
+            return await _context
+                .Stocks.Include(c => c.Comments)
+                .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         // public Task<Stock?> GetBySymbolAsync(string symbol)
@@ -57,25 +73,51 @@ namespace api.Repository
 
         public async Task<Stock?> UpdateAsync(int id, UpdateStockRequestDto stockDto)
         {
-            var existingStock= await _context.Stocks.FirstOrDefaultAsync(x=>x.Id==id);
-            if(existingStock == null){
+            var existingStock = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existingStock == null)
+            {
                 return null;
             }
 
-            existingStock.Symbol=stockDto.Symbol;
-            existingStock.CompanyName=stockDto.CompanyName;
-            existingStock.Purchase=stockDto.Purchase;
-            existingStock.LastDiv=stockDto.LastDiv;
-            existingStock.Industry=stockDto.Industry;
-            existingStock.MarketCap=stockDto.MarketCap;
+            existingStock.Symbol = stockDto.Symbol;
+            existingStock.CompanyName = stockDto.CompanyName;
+            existingStock.Purchase = stockDto.Purchase;
+            existingStock.LastDiv = stockDto.LastDiv;
+            existingStock.Industry = stockDto.Industry;
+            existingStock.MarketCap = stockDto.MarketCap;
 
             await _context.SaveChangesAsync();
             return existingStock;
         }
 
-         public Task<bool> StockExists(int id)
+        public Task<bool> StockExists(int id)
         {
             return _context.Stocks.AnyAsync(s => s.Id == id);
+        }
+
+        public async Task<Stock?> PatchAsync(int id, StockPatchDto patchDto)
+        {
+            var existingStock = await _context.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (existingStock == null)
+            {
+                return null;
+            }
+
+            // Update only the fields provided in the patch DTO
+            if (patchDto.Purchase.HasValue)
+            {
+                existingStock.Purchase = patchDto.Purchase.Value;
+            }
+
+            if (!string.IsNullOrWhiteSpace(patchDto.CompanyName))
+            {
+                existingStock.CompanyName = patchDto.CompanyName;
+            }
+
+            await _context.SaveChangesAsync();
+            return existingStock;
         }
     }
 }

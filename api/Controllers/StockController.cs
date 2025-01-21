@@ -1,5 +1,6 @@
 using api.Data;
 using api.Dtos.Stock;
+using api.Helppers;
 using api.Interfaces;
 using api.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -21,12 +22,12 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromQuery] QueryObject query)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var stocks = await _stockRepo.GetAllAsync();
+            var stocks = await _stockRepo.GetAllAsync(query);
             var stockDto = stocks.Select(s => s.ToStockDto()).ToList();
             return Ok(stockDto);
         }
@@ -93,6 +94,23 @@ namespace api.Controllers
             }
 
             return NoContent(); //for delete method
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Patch([FromRoute]int id, [FromBody] StockPatchDto patchDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (patchDto == null)
+                return BadRequest("Invalid patch data.");
+
+            var stockModel =await _stockRepo.PatchAsync(id, patchDto);
+
+            if (stockModel == null)
+                return NotFound($"Stock with ID {id} not found.");
+
+            return Ok(stockModel.ToStockDto());
         }
     }
 }
